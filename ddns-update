@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import sys
 import base64
 import http.client
 import logging
@@ -13,6 +14,8 @@ DEBUG = False
 
 logging.basicConfig(format='%(asctime)s %(message)s'
                     , filename='/var/log/ddns-update.log', level=logging.DEBUG)
+
+logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 logging.info('Started')
 
 class Record:
@@ -95,7 +98,7 @@ class Record:
 class Domain:
     def __init__(self):
         self.records = []
-        self.tick_time = 120
+        self.tick_time = 300
 
     def add(self, sub_domain, user, password):
         """Append a record to self.records"""

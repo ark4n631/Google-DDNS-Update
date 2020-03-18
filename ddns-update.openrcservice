@@ -1,8 +1,0 @@
-#!/sbin/openrc-run
-depend() {
-	need net
-	use logger dns
-}
-command="/usr/bin/ddns-update"
-command_background=true
-pidfile="/run/${RC_SVCNAME}.pid"

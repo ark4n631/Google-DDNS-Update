@@ -1,190 +1,67 @@
-# Google-DDNS-Update
+# Google-DDNS-Update Docker version
 Simple Google Domains DDNS Public IP Updater
 
 A simple tool that keeps dynamic dns records updated
 on Google Domains.
 
-Has also been tested and works on Raspbian on the Raspberry Pi. Thanks to RandLoki.
-Tested and working on siaberry with openRC method.
+This is a fork from [jcruse03/Google-DDNS-Update](https://github.com/jcruse03/Google-DDNS-Update.git)
 
-## -------Installation--------
+All the credits goes to him and his python code, this is just a small wrapper to run it through docker, i've created this project because i required to update a google DNS through a NAT network. I found really nice the implementantion but i wanted to have it OS agnostic that's why i decided to make a docker version.
 
-## ---Linux with systemd---
+## Requirements:
 
-If you do not know try this first.
-Used in Ubuntu, Raspbian, Mint, Manjaro, and Arch by default.
+- [Docker](https://docs.docker.com/install/) service.
+- git.
 
-This will start ddns-update at boot and run it as a daemon.
 
-Requires python 3, systemd
+## Installation
+First you need to clone the repo:
 
-*If updating or reinstalling follow steps 1-4. Your /etc/ddns-update.conf file will not be modified.*
-1. Clone the repo.
-```bash
-$ git clone https://github.com/jcruse03/Google-DDNS-Update.git
-```
-2. cd into /Google-DDNS-Update
-3. Update permissions of setup.sh.
-```bash
-$ sudo chmod 744 setup.sh
-```
-4. Run setup.sh with sudo.
-```bash
-$ sudo ./setup.sh
-```
-*The downloaded repo files are no longer needed at this point and can be deleted.*
-
-*If updating or reinstalling you are done.*
-
-5. Edit the config file at /etc/ddns-update.conf
-  You must have at least 1 ddns synthetic record already set up on google domains. 
-  Your credentials will be found in each individual record. Click the dropdown arrow then click 'view credentials'.
-  Each record should be on a single line with each element seperated by a single space in the following format.
-```bash
-your-subdomain.your-domain.com your-google-ddns-username your-google-ddns-password
-```  
-```bash
-$ sudo nano /etc/ddns-update.conf
-```
-6. Configure systemd.
-```bash
-$ sudo systemctl daemon-reload
-$ sudo systemctl enable ddns-update.service
-$ sudo systemctl start ddns-update.service
+```sh
+git clone git@github.com:ark4n631/Google-DDNS-Update.git
+cd Google-DDNS-Update
 ```
 
-You should now have ddns-update running as a daemon and it will start at boot.
+## Docker
 
-The downloaded repo and files can be deleted.
+Make sure you have docker installed and your user is able to manipulate the docker service.
 
-You can check the status of the service with:
-```bash
-$ sudo systemctl status ddns-update.service
+First make sure you configure  your DNS entries in `ddns-update.conf` there is an example in the file.
+
+### Build the image
+Then you need to build the image simply do:
+
+```sh
+docker build -t google-ddns-updated:latest .
 ```
 
-If you edit /etc/ddns-update.conf after the initial setup just make sure to restart the service.
-```bash
-$ sudo systemctl stop ddns-update.service
-$ sudo systemctl start ddns-update.service
-```
+### Run the image
+You can run the image and atttach to the logs, make sure it works (ctrl+c to stop):
 
-You can also view the log file at /var/log/ddns-update.log or using tail.
-```bash
-$ tail -f /var/log/ddns-update.log
+```sh
+docker run --rm -it --name google-ddns google-ddns-updated:latest
 ```
 
 
-## ---Linux with openRC---
+### Run the container as service
 
-Use this option for systems with openRC.
+**Run** the image in detach (`-d`) mode to do this simply run:
 
-Used by gentoo and siaberry by default.
-
-This will start ddns-update at boot and run it as a daemon.
-
-Requires python 3, openRC
-
-*If updating or reinstalling follow steps 1-4. Your /etc/ddns-update.conf file will not be modified.*
-*All commands expect you to be logged in as root #.*
-1. Clone the repo.
-```bash
-# git clone https://github.com/jcruse03/Google-DDNS-Update.git
-```
-2. cd into /Google-DDNS-Update
-3. Update permissions of setup.sh
-```bash
-# chmod 744 setup-rc.sh
-```
-4. Run setup-rc.sh
-```bash
-# ./setup-rc.sh
-```
-*The downloaded repo files are no longer needed at this point and can be deleted.*
-
-*If updating or reinstalling skip to restarting the service at the end of this section.*
-
-5. Edit the config file at /etc/ddns-update.conf
-  You must have at least 1 ddns synthetic record already set up on google domains. 
-  Your credentials will be found in each individual record. Click the dropdown arrow then click 'view credentials'.
-  Each record should be on a single line with each element seperated by a single space in the following format.
-```bash
-your-subdomain.your-domain.com your-google-ddns-username your-google-ddns-password
-```  
-```bash
-# nano /etc/ddns-update.conf
-```
-6. Start the service.
-```bash
-# rc-service ddns-update.service start
+```sh
+docker run --rm -d --name google-ddns google-ddns-updated:latest
 ```
 
-You should now have ddns-update running as a daemon and it will start at boot.
+To see the **LOGS** use:
 
-The downloaded repo and files can be deleted.
-
-You can check the status of the service with:
-```bash
-# rc-service ddns-update.service status
-```
-### Restarting the service
-If you edit /etc/ddns-update.conf after the initial setup or have updated or reinstalled just make sure to restart the service.
-```bash
-# rc-service ddns-update.service stop
-# rc-service ddns-update.service start
+```sh
+docker logs -f google-ddns
 ```
 
-You can also view the log file at /var/log/ddns-update.log or using tail.
-```bash
-$ tail -f /var/log/ddns-update.log
+To **STOP** the service, this will delete the image (since we used `--rm`):
+
+```sh
+docker stop gogole-ddns
 ```
 
-
-
-## ---MacOS---
-
-This will start ddns-update at boot and run it as a daemon.
-
-Requires python 3, see http://docs.python-guide.org/en/latest/starting/install3/osx/
-
-*If updating or reinstalling follow steps 1-4 and see reloading the service at the end. Your /etc/ddns-update.conf file will not be modified.*
-1. Download and extract or clone the repo.
-2. Open a terminal and cd into the directory where you extracted the repo.
-3. Run mac-setup.sh with sudo.
-```bash
-$ sudo ./mac-setup.sh
-```
-*The downloaded repo files are no longer needed at this point and can be deleted.*
-
-*If updating or reinstalling go to step 5. Your /etc/ddns-update.conf has not been modified.*
-
-4. Edit the config file at /etc/ddns-update.conf
-  You must have at least 1 ddns synthetic record already set up on google domains. 
-  Your credentials will be found in each individual record. Click the dropdown arrow then click 'view credentials'.
-  Each record should be on a single line with each element seperated by a single space in the following format.
-```bash
-your-subdomain.your-domain.com your-google-ddns-username your-google-ddns-password
-```  
-```bash
-$ sudo nano /etc/ddns-update.conf
-```
-5. Configure launchctl.
-*Fresh install just start the service.*
-```bash
-$ sudo launchctl load /Library/LaunchDaemons/ddns-update.plist
-```
-
-*If you have updated or reinstalled ddns-update, or edited /etc/ddns-update.conf, make sure to restart the service.*
-```bash
-$ sudo launchctl unload /Library/LaunchDaemons/ddns-update.plist
-$ sudo launchctl load /Library/LaunchDaemons/ddns-update.plist
-```
-
-You should now have ddns-update running as a daemon and it will start at boot.
-
-The downloaded repo and files can be deleted.
-
-You can also view the log file at /var/log/ddns-update.log or using tail.
-```bash
-$ tail -f /var/log/ddns-update.log
-```
-
+---
+*Happy Hacking* :-)
