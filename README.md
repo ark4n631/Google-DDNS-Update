@@ -48,7 +48,7 @@ docker run --rm -it --name google-ddns google-ddns-updated:latest
 **Run** the image in detach (`-d`) mode to do this simply run:
 
 ```sh
-docker run --rm -d --name google-ddns google-ddns-updated:latest
+docker run -d --name google-ddns --restart always google-ddns-updated:latest
 ```
 
 To see the **LOGS** use:
